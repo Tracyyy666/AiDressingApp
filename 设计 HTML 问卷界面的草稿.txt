@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 穿搭助手 - 问卷</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 自定义滑块样式 */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #4F46E5;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <!-- 标题 -->
+        <header class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">👗 AI 智能穿搭助手</h1>
+            <p class="text-gray-500 text-sm mt-2">输入你的数据，获取专业搭配建议</p>
+        </header>
+
+        <form id="quizForm" class="space-y-6">
+            <!-- 身高滑块 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    身高 (cm): <span id="heightVal" class="text-indigo-600 font-bold">170</span>
+                </label>
+                <input type="range" min="140" max="200" value="170" id="height" 
+                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+            <!-- 体重输入 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">体重 (kg)</label>
+                <input type="number" placeholder="例如: 60" id="weight"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <!-- 体型下拉菜单 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">你的体型</label>
+                <select id="bodyShape" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="pear">梨型 (上窄下宽)</option>
+                    <option value="apple">苹果型 (腰腹丰满)</option>
+                    <option value="hourglass">沙漏型 (凹凸有致)</option>
+                    <option value="rectangle">矩形 (直线条)</option>
+                    <option value="inverted_triangle">倒三角 (肩宽胯窄)</option>
+                </select>
+            </div>
+
+            <!-- 风格复选框 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">偏好风格 (可多选)</label>
+                <div class="flex flex-wrap gap-2">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="style" value="casual" class="hidden peer">
+                        <span class="px-4 py-1 border border-gray-300 rounded-full text-sm cursor-pointer peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600">休闲</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="style" value="work" class="hidden peer">
+                        <span class="px-4 py-1 border border-gray-300 rounded-full text-sm cursor-pointer peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600">职场</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="style" value="date" class="hidden peer">
+                        <span class="px-4 py-1 border border-gray-300 rounded-full text-sm cursor-pointer peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600">约会</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="style" value="vintage" class="hidden peer">
+                        <span class="px-4 py-1 border border-gray-300 rounded-full text-sm cursor-pointer peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600">复古</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 提交按钮 -->
+            <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200">
+                ✨ 生成我的专属穿搭
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // 滑块数值实时显示
+        const heightInput = document.getElementById('height');
+        const heightVal = document.getElementById('heightVal');
+        heightInput.oninput = function() {
+            heightVal.innerText = this.value;
+        }
+
+        // 表单提交逻辑
+        document.getElementById('quizForm').onsubmit = function(e) {
+            e.preventDefault();
+            alert('数据已收集，准备调用 AI 接口！');
+            // 之后在这里对接你的 Python/DeepSeek API
+        }
+    </script>
+</body>
+</html>
