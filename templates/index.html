@@ -82,22 +82,87 @@
             <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-200">
                 ✨ 生成我的专属穿搭
             </button>
-        </form>
+        </form><div id="resultCard" class="mt-8 p-6 bg-indigo-50 rounded-xl border border-indigo-100 hidden">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                ✨ AI 专属穿搭建议
+            </h3>
+            <div class="space-y-4 text-sm text-gray-700">
+                <div><strong>👕 上装建议：</strong> <span id="resTop"></span></div>
+                <div><strong>👖 下装建议：</strong> <span id="resBottom"></span></div>
+                <div><strong>👟 鞋履搭配：</strong> <span id="resShoes"></span></div>
+                <div class="pt-2 border-t border-indigo-200">
+                    <strong>🧠 穿搭逻辑：</strong> <p id="resAnalysis" class="mt-1 text-xs italic text-gray-600"></p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 滑块数值实时显示
+        // --- 滑块数值实时显示 ---
         const heightInput = document.getElementById('height');
         const heightVal = document.getElementById('heightVal');
-        heightInput.oninput = function() {
-            heightVal.innerText = this.value;
+        if (heightInput && heightVal) {
+            heightInput.oninput = function() {
+                heightVal.innerText = this.value;
+            };
         }
 
-        // 表单提交逻辑
-        document.getElementById('quizForm').onsubmit = function(e) {
-            e.preventDefault();
-            alert('数据已收集，准备调用 AI 接口！');
-            // 之后在这里对接你的 Python/DeepSeek API
+        // --- 表单提交与 AI 交互逻辑 ---
+        const quizForm = document.getElementById('quizForm');
+        if (quizForm) {
+            quizForm.onsubmit = async function(e) {
+                e.preventDefault();
+                
+                // 收集数据
+                const height = document.getElementById('height').value;
+                const weight = document.getElementById('weight').value;
+                const bodyShape = document.getElementById('bodyShape').value;
+                const styleElements = document.querySelectorAll('input[name="style"]:checked');
+                const styles = Array.from(styleElements).map(el => el.value);
+
+                // 改变按钮状态
+                const btn = e.target.querySelector('button');
+                const originalText = btn.innerText;
+                btn.innerText = "🚀 AI 正在构思中...";
+                btn.disabled = true;
+
+                try {
+                    // 发送异步请求给后端
+                    const response = await fetch('/get_advice', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            height: parseInt(height), 
+                            weight: parseInt(weight), 
+                            body_shape: bodyShape, 
+                            styles: styles 
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // 渲染结果
+                        document.getElementById('resTop').innerText = data.advice.top;
+                        document.getElementById('resBottom').innerText = data.advice.bottom;
+                        document.getElementById('resShoes').innerText = data.advice.shoes;
+                        document.getElementById('resAnalysis').innerText = data.advice.analysis;
+                        
+                        // 显示卡片
+                        const resultCard = document.getElementById('resultCard');
+                        resultCard.classList.remove('hidden');
+                        resultCard.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        alert("AI 获取失败：" + data.error);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("连接后端失败，请确认 python app.py 是否在运行？");
+                } finally {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            };
         }
     </script>
 </body>
