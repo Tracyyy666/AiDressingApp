@@ -7,14 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* 引入图片中的衬线体质感 */
         body {
             font-family: 'Noto Serif SC', serif;
-            background-color: #f5eee1; /* 柔和的米色/奶酪色背景，比原图稍深 */
+            background-color: #f5eee1;
             overflow-x: hidden;
         }
-
-        /* 自定义刻度滑块样式 */
         input[type=range] {
             -webkit-appearance: none;
             background: linear-gradient(to right, #c5a059 0%, #c5a059 var(--percent), #e5d5bc var(--percent), #e5d5bc 100%);
@@ -25,19 +22,11 @@
             -webkit-appearance: none;
             height: 18px; width: 18px;
             border-radius: 50%;
-            background: #c5a059; /* 柔和的金色 */
+            background: #c5a059;
             border: 2px solid #ffffff;
             cursor: pointer;
             box-shadow: 0 0 5px rgba(197, 160, 89, 0.5);
-            transition: all 0.2s;
         }
-
-        /* 隐藏滚动条但保留功能 */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* 刻度背景模拟 */
         .ruler-marks {
             position: absolute;
             bottom: 0;
@@ -48,62 +37,78 @@
             background-size: 10px 100%;
             opacity: 0.3;
         }
-
+        .history-panel {
+            background: #fcfaf7;
+            border: 1px solid #e5d5bc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            border-bottom: 1px solid #f0e6d6;
+            padding: 0.8rem 0;
+            font-size: 0.85rem;
+        }
+        .history-btn {
+            background: #fcfaf7;
+            border: 1px solid #e5d5bc;
+            color: #4a3a2a;
+            transition: all 0.2s;
+        }
+        .history-btn:hover {
+            background: #c5a059;
+            color: white;
+            border-color: #c5a059;
+        }
+        .hidden-history {
+            display: none;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 relative">
 
+    <!-- 装饰元素（简化，略） -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 select-none opacity-20">
         <svg class="absolute -left-10 top-1/4 w-[400px] h-auto text-[#c5a059]" viewBox="0 0 200 300" fill="none" stroke="currentColor" stroke-width="0.5">
             <path d="M100 50 C80 80 40 100 40 150 C40 250 160 250 160 150 C160 100 120 80 100 50 Z" />
             <path d="M100 50 L100 40 M90 45 L110 45" />
             <path d="M60 160 Q100 140 140 160 M50 180 Q100 160 150 180 M45 200 Q100 180 155 200" />
         </svg>
-
         <svg class="absolute -right-20 top-10 w-[350px] h-auto text-[#c5a059]" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="0.5">
             <path d="M60 40 L140 40 L150 150 L50 150 Z" />
             <path d="M60 40 L40 70 L50 150 M140 40 L160 70 L150 150" />
             <path d="M100 40 L80 80 L100 150 L120 80 Z" />
         </svg>
-
         <div class="absolute top-1/4 right-1/4 animate-pulse text-[#c5a059]">✦</div>
         <div class="absolute bottom-1/3 left-1/3 animate-pulse text-[#c5a059] delay-700" style="animation-duration: 3s">✦</div>
-        <div class="absolute top-10 left-10 opacity-40 text-xl text-[#c5a059]">✧</div>
     </div>
 
     <div class="bg-[#fdfcf7] p-10 rounded-xl shadow-2xl w-full max-w-lg border border-[#e5d5bc] relative z-10">
         <div class="absolute top-4 left-4 right-4 bottom-4 border border-[#f0e6d6] pointer-events-none rounded-lg"></div>
 
         <header class="text-center mb-10">
-            <div class="inline-block relative">
-                <span class="absolute -left-10 top-1/2 -translate-y-1/2 text-[#c5a059] opacity-40 text-xl">✧</span>
-                <h1 class="text-3xl font-bold text-[#4a3a2a] tracking-widest flex items-center justify-center gap-4">
-                    AI 智能穿搭助手
-                </h1>
-                <span class="absolute -right-10 top-1/2 -translate-y-1/2 text-[#c5a059] opacity-40 text-xl">✧</span>
-            </div>
+            <h1 class="text-3xl font-bold text-[#4a3a2a] tracking-widest">AI 智能穿搭助手</h1>
             <div class="w-16 h-px bg-[#c5a059] mx-auto my-3 opacity-30"></div>
             <p class="text-[#8c7a66] text-xs tracking-widest font-light uppercase">Personal Stylist Guide</p>
-        }
         </header>
 
         <form id="quizForm" class="space-y-8 px-2">
             <div>
-                <label class="block text-xs font-bold text-[#8c7a66] mb-3 tracking-widest uppercase">身高 (cm): <span id="heightVal" class="text-[#c5a059] ml-1">170</span></label>
+                <label class="block text-xs font-bold text-[#8c7a66] mb-3">身高 (cm): <span id="heightVal" class="text-[#c5a059]">170</span></label>
                 <div class="relative pt-2">
                     <input type="range" min="140" max="200" value="170" id="height" class="w-full">
                     <div class="ruler-marks pointer-events-none"></div>
                 </div>
             </div>
-
             <div>
-                <label class="block text-xs font-bold text-[#8c7a66] mb-3 tracking-widest uppercase">体重 (kg)</label>
-                <input type="number" placeholder="例如: 60" id="weight" class="w-full bg-[#fcfaf5] px-4 py-2 border-b border-[#e5d5bc] text-[#4a3a2a] outline-none focus:border-[#c5a059] transition-all">
+                <label class="block text-xs font-bold text-[#8c7a66] mb-3">体重 (kg)</label>
+                <input type="number" id="weight" placeholder="例如: 60" class="w-full bg-[#fcfaf5] px-4 py-2 border-b border-[#e5d5bc] outline-none focus:border-[#c5a059]">
             </div>
-
             <div>
-                <label class="block text-xs font-bold text-[#8c7a66] mb-3 tracking-widest uppercase">你的体型</label>
-                <select id="bodyShape" class="w-full bg-[#fcfaf5] px-4 py-2 border border-[#e5d5bc] rounded text-[#4a3a2a] outline-none cursor-pointer">
+                <label class="block text-xs font-bold text-[#8c7a66] mb-3">你的体型</label>
+                <select id="bodyShape" class="w-full bg-[#fcfaf5] px-4 py-2 border border-[#e5d5bc] rounded">
                     <option value="pear">梨型 (上窄下宽)</option>
                     <option value="apple">苹果型 (腰腹丰满)</option>
                     <option value="hourglass">沙漏型 (凹凸有致)</option>
@@ -111,136 +116,187 @@
                     <option value="inverted_triangle">倒三角 (肩宽胯窄)</option>
                 </select>
             </div>
-
             <div>
-                <label class="block text-xs font-bold text-[#8c7a66] mb-3 tracking-widest uppercase">穿搭风格 (可选)</label>
+                <label class="block text-xs font-bold text-[#8c7a66] mb-3">穿搭风格 (可选)</label>
                 <div class="flex flex-wrap gap-3">
                     <label class="inline-flex items-center">
-                        <input type="checkbox" name="style" value="casual" class="hidden peer">
-                        <span class="px-5 py-1.5 border border-[#e5d5bc] rounded-full text-xs text-[#8c7a66] cursor-pointer transition-all peer-checked:bg-[#c5a059] peer-checked:text-white peer-checked:border-[#c5a059] hover:border-[#c5a059]">休闲</span>
+                        <input type="checkbox" name="style" value="休闲" class="hidden peer">
+                        <span class="px-5 py-1.5 border rounded-full text-xs cursor-pointer peer-checked:bg-[#c5a059] peer-checked:text-white">休闲</span>
                     </label>
                     <label class="inline-flex items-center">
-                        <input type="checkbox" name="style" value="work" class="hidden peer">
-                        <span class="px-5 py-1.5 border border-[#e5d5bc] rounded-full text-xs text-[#8c7a66] cursor-pointer transition-all peer-checked:bg-[#c5a059] peer-checked:text-white peer-checked:border-[#c5a059] hover:border-[#c5a059]">通勤</span>
+                        <input type="checkbox" name="style" value="职场" class="hidden peer">
+                        <span class="px-5 py-1.5 border rounded-full text-xs cursor-pointer peer-checked:bg-[#c5a059] peer-checked:text-white">通勤</span>
                     </label>
                     <label class="inline-flex items-center">
-                        <input type="checkbox" name="style" value="date" class="hidden peer">
-                        <span class="px-5 py-1.5 border border-[#e5d5bc] rounded-full text-xs text-[#8c7a66] cursor-pointer transition-all peer-checked:bg-[#c5a059] peer-checked:text-white peer-checked:border-[#c5a059] hover:border-[#c5a059]">约会</span>
+                        <input type="checkbox" name="style" value="约会" class="hidden peer">
+                        <span class="px-5 py-1.5 border rounded-full text-xs cursor-pointer peer-checked:bg-[#c5a059] peer-checked:text-white">约会</span>
                     </label>
                     <label class="inline-flex items-center">
-                        <input type="checkbox" name="style" value="vintage" class="hidden peer">
-                        <span class="px-5 py-1.5 border border-[#e5d5bc] rounded-full text-xs text-[#8c7a66] cursor-pointer transition-all peer-checked:bg-[#c5a059] peer-checked:text-white peer-checked:border-[#c5a059] hover:border-[#c5a059]">复古</span>
+                        <input type="checkbox" name="style" value="复古" class="hidden peer">
+                        <span class="px-5 py-1.5 border rounded-full text-xs cursor-pointer peer-checked:bg-[#c5a059] peer-checked:text-white">复古</span>
                     </label>
                 </div>
             </div>
-
-            <button type="submit" class="w-full bg-[#1a202c] text-[#f5eee1] py-4 rounded-sm font-bold tracking-[0.2em] hover:bg-[#2d3748] transition-all shadow-xl active:scale-[0.98]">
+            <button type="submit" class="w-full bg-[#1a202c] text-[#f5eee1] py-4 rounded-sm font-bold tracking-[0.2em] hover:bg-[#2d3748] transition-all">
                 生成我的专属穿搭
             </button>
         </form>
 
-        <div id="resultCard" class="mt-10 p-8 bg-[#fcfaf5] rounded-sm border border-[#e5d5bc] hidden animate-fade-in relative">
-            <div class="absolute top-2 right-4 text-[#c5a059] opacity-20 italic">Style Guide</div>
-            <h3 class="text-sm font-bold text-[#4a3a2a] mb-6 flex items-center gap-2 border-b border-[#e5d5bc] pb-2 tracking-[0.2em]">
-                <span class="text-[#c5a059]">✦</span> AI 专属穿搭建议
-            </h3>
-            <div class="grid grid-cols-1 gap-5 text-xs text-[#4a3a2a]">
-                <p><strong class="text-[#c5a059] font-bold">👕 上装建议:</strong> <span id="resTop" class="font-light"></span></p>
-                <p><strong class="text-[#c5a059] font-bold">👖 下装建议:</strong> <span id="resBottom" class="font-light"></span></p>
-                <p><strong class="text-[#c5a059] font-bold">👟 鞋履搭配:</strong> <span id="resShoes" class="font-light"></span></p>
-                <div class="mt-4 pt-4 border-t border-[#e5d5bc]">
-                    <strong class="text-[#c5a059] block mb-2 tracking-widest">🧠 穿搭逻辑说明：</strong>
-                    <p id="resAnalysis" class="italic text-[#8c7a66] leading-relaxed"></p>
-                </div>
+        <div id="resultCard" class="mt-10 p-8 bg-[#fcfaf5] rounded-sm border border-[#e5d5bc] hidden">
+            <h3 class="text-sm font-bold text-[#4a3a2a] mb-4 border-b pb-2">✦ AI 专属穿搭建议</h3>
+            <div class="grid gap-4 text-xs">
+                <p><strong class="text-[#c5a059]">👕 上装:</strong> <span id="resTop"></span></p>
+                <p><strong class="text-[#c5a059]">👖 下装:</strong> <span id="resBottom"></span></p>
+                <p><strong class="text-[#c5a059]">👟 鞋履:</strong> <span id="resShoes"></span></p>
+                <div class="pt-2"><strong class="text-[#c5a059]">🧠 理由:</strong> <span id="resAnalysis" class="italic"></span></div>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <button id="historyBtn" class="history-btn w-full py-2 text-sm tracking-wider rounded-sm">📜 历史搭配记录</button>
+            <div id="historyPanel" class="history-panel hidden-history">
+                <div id="historyList"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 滑块实时更新
-        const heightInput = document.getElementById('height');
-        const heightVal = document.getElementById('heightVal');
+        (function() {
+            // 后端基础地址（可自行改为你的实际 IP:端口）
+            const API_BASE = 'http://127.0.0.1:5000';
 
-        // 设置滑块背景填充比例
-        function setPercent() {
-            const percent = (heightInput.value - heightInput.min) / (heightInput.max - heightInput.min) * 100;
-            heightInput.style.setProperty('--percent', `${percent}%`);
-        }
+            // DOM
+            const heightInput = document.getElementById('height');
+            const heightVal = document.getElementById('heightVal');
+            const weightInput = document.getElementById('weight');
+            const bodyShapeSelect = document.getElementById('bodyShape');
+            const styleChecks = document.querySelectorAll('input[name="style"]');
+            const form = document.getElementById('quizForm');
+            const resultCard = document.getElementById('resultCard');
+            const resTop = document.getElementById('resTop');
+            const resBottom = document.getElementById('resBottom');
+            const resShoes = document.getElementById('resShoes');
+            const resAnalysis = document.getElementById('resAnalysis');
+            const historyBtn = document.getElementById('historyBtn');
+            const historyPanel = document.getElementById('historyPanel');
+            const historyListDiv = document.getElementById('historyList');
 
-        heightInput.oninput = function() {
-            heightVal.innerText = this.value;
+            // 滑块
+            function setPercent() {
+                const val = heightInput.value;
+                const percent = (val - 140) / 60 * 100;
+                heightInput.style.setProperty('--percent', `${percent}%`);
+                heightVal.innerText = val;
+            }
+            heightInput.addEventListener('input', setPercent);
             setPercent();
-        };
 
-        // 初始化滑块比例
-        setPercent();
+            function getSelectedStyles() {
+                const selected = [];
+                styleChecks.forEach(cb => { if (cb.checked) selected.push(cb.value); });
+                return selected;
+            }
 
-        // 表单提交与 AI 交互逻辑 (合并了动画效果)
-        document.getElementById('quizForm').onsubmit = async function(e) {
-            e.preventDefault();
-            
-            const btn = e.target.querySelector('button');
-            const originalHTML = btn.innerHTML; // 备份原来的按钮代码
+            async function saveHistory(userData, outfit) {
+                const payload = {
+                    user_id: "default",
+                    height: userData.height,
+                    weight: userData.weight,
+                    bodyShape: userData.bodyShape,
+                    styles: userData.styles,
+                    top: outfit.top,
+                    bottom: outfit.bottom,
+                    shoes: outfit.shoes,
+                    reason: outfit.reason
+                };
+                try {
+                    await fetch(`${API_BASE}/save_history`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } catch (err) { console.warn("保存历史失败", err); }
+            }
 
-            // 酷炫的复合加载动画
-            btn.innerHTML = `
-                <div class="flex items-center justify-center gap-3">
-                    <div class="relative w-6 h-6 flex items-center justify-center">
-                        <div class="absolute inset-0 border-2 border-indigo-200 border-t-[#c5a059] rounded-full animate-spin"></div>
-                        <span class="relative text-sm">🚀</span>
-                    </div>
-                    <span>AI 正在构思中</span>
-                    <span class="inline-flex">
-                        <span class="animate-bounce" style="animation-duration: 0.8s; animation-delay: 0s;">.</span>
-                        <span class="animate-bounce" style="animation-duration: 0.8s; animation-delay: 0.2s;">.</span>
-                        <span class="animate-bounce" style="animation-duration: 0.8s; animation-delay: 0.4s;">.</span>
-                    </span>
-                </div>
-            `;
-            btn.disabled = true;
+            async function loadHistory() {
+                try {
+                    const resp = await fetch(`${API_BASE}/get_history?user_id=default`);
+                    const records = await resp.json();
+                    if (!records || records.length === 0) {
+                        historyListDiv.innerHTML = '<div class="text-center text-[#8c7a66] py-4">暂无历史搭配记录</div>';
+                        return;
+                    }
+                    let html = '';
+                    records.forEach(rec => {
+                        const timestamp = new Date(rec.timestamp).toLocaleString();
+                        const stylesStr = (rec.styles || []).join('、');
+                        html += `
+                            <div class="history-item">
+                                <small>📅 ${timestamp}</small><br>
+                                <strong>📏 ${rec.height}cm / ⚖️ ${rec.weight}kg / ${rec.bodyShape}</strong><br>
+                                🎨 风格：${stylesStr}<br>
+                                🧥 上衣：${rec.top} &nbsp;|&nbsp; 👖 下装：${rec.bottom} &nbsp;|&nbsp; 👟 鞋子：${rec.shoes}<br>
+                                💬 ${rec.reason}
+                            </div>
+                        `;
+                    });
+                    historyListDiv.innerHTML = html;
+                } catch (err) {
+                    console.error(err);
+                    historyListDiv.innerHTML = '<div class="text-center text-red-500 py-4">加载失败，请确保后端已启动</div>';
+                }
+            }
 
-            const height = document.getElementById('height').value;
-            const weight = document.getElementById('weight').value;
-            const bodyShape = document.getElementById('bodyShape').value;
-            const styles = Array.from(document.querySelectorAll('input[name="style"]:checked')).map(el => el.value);
+            historyBtn.addEventListener('click', async () => {
+                const isHidden = historyPanel.classList.contains('hidden-history');
+                if (isHidden) {
+                    await loadHistory();
+                    historyPanel.classList.remove('hidden-history');
+                    historyBtn.textContent = '📜 隐藏历史记录';
+                } else {
+                    historyPanel.classList.add('hidden-history');
+                    historyBtn.textContent = '📜 历史搭配记录';
+                }
+            });
 
-            try {
-                // 发送网络请求给队友的后端
-                const response = await fetch('/get_advice', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        height: parseInt(height), 
-                        weight: parseInt(weight), 
-                        body_shape: bodyShape, 
-                        styles: styles 
-                    })
-                });
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const height = parseInt(heightInput.value);
+                const weight = parseFloat(weightInput.value);
+                if (!weight || weight <= 0) return alert("请填写体重");
+                const bodyShape = bodyShapeSelect.value;
+                const styles = getSelectedStyles();
+                if (styles.length === 0) return alert("请至少选择一种风格");
 
-                const data = await response.json();
+                const submitBtn = form.querySelector('button');
+                const originalText = submitBtn.innerText;
+                submitBtn.innerText = "🤔 AI 思考中...";
+                submitBtn.disabled = true;
 
-                if (data.success) {
-                    // 渲染建议结果 (使用 innerText 更安全)
-                    document.getElementById('resTop').innerText = data.advice.top;
-                    document.getElementById('resBottom').innerText = data.advice.bottom;
-                    document.getElementById('resShoes').innerText = data.advice.shoes;
-                    document.getElementById('resAnalysis').innerText = data.advice.analysis;
-                    
-                    const resultCard = document.getElementById('resultCard');
+                try {
+                    const response = await fetch(`${API_BASE}/recommend`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ height, weight, bodyShape, styles })
+                    });
+                    const data = await response.json();
+                    if (data.error) throw new Error(data.error);
+                    resTop.innerText = data.top;
+                    resBottom.innerText = data.bottom;
+                    resShoes.innerText = data.shoes;
+                    resAnalysis.innerText = data.reason;
                     resultCard.classList.remove('hidden');
                     resultCard.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    alert("AI 获取失败：" + data.error);
+                    await saveHistory({ height, weight, bodyShape, styles }, data);
+                    if (!historyPanel.classList.contains('hidden-history')) await loadHistory();
+                } catch (err) {
+                    alert("推荐失败：" + err.message);
+                } finally {
+                    submitBtn.innerText = originalText;
+                    submitBtn.disabled = false;
                 }
-            } catch (err) {
-                console.error(err);
-                alert("无法连接到后端，请确认你的 python app.py 是否在运行并在 5000 端口运行？");
-            } finally {
-                // 恢复按钮状态
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-            }
-        }
+            });
+        })();
     </script>
 </body>
 </html>
