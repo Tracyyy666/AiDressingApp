@@ -3,30 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 穿搭灵魂助手 - 终极定制版</title>
+    <title>AI 穿搭灵魂助手 - 最终形态</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Serif SC', serif; background-color: #f5eee1; background-image: radial-gradient(#d4c4a8 0.5px, transparent 0.5px); background-size: 30px 30px; }
         
-        /* 身高滑块 */
+        /* 身高滑块自定义 */
         input[type=range] { -webkit-appearance: none; background: linear-gradient(to right, #c5a059 0%, #c5a059 var(--percent, 50%), #e5d5bc var(--percent, 50%), #e5d5bc 100%); height: 2px; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #c5a059; border: 2px solid #ffffff; cursor: pointer; }
         .ruler-marks { position: absolute; bottom: -8px; left: 0; width: 100%; height: 8px; background-image: linear-gradient(90deg, #c5a059 1.5px, transparent 1.5px); background-size: 10% 100%; opacity: 0.3; }
 
-        /* 智能体重选择框 */
+        /* 智能体重框：支持滚动与输入 */
         .weight-box { background: #fcfaf5; border: 1px solid #e5d5bc; border-radius: 12px; height: 56px; display: flex; align-items: center; justify-content: center; position: relative; transition: border-color 0.3s; }
         .weight-box:hover { border-color: #c5a059; }
         .weight-input { background: transparent; border: none; text-align: center; font-size: 1.5rem; color: #c5a059; font-weight: bold; width: 100%; outline: none; cursor: ns-resize; }
         .weight-input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-        /* 性别动态切换 */
+        /* 性别动态切换开关 */
         .gender-toggle { position: relative; width: 140px; height: 40px; background: #fcfaf5; border: 1px solid #e5d5bc; border-radius: 20px; display: flex; cursor: pointer; padding: 2px; }
         .gender-knob { position: absolute; width: 68px; height: 34px; background: #c5a059; border-radius: 17px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .gender-label { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; z-index: 10; transition: color 0.3s; }
 
         .star { color: #846b3a; position: absolute; pointer-events: none; z-index: 0; }
         .tag-bubble { background: #ebd3a6; color: #4a3a2a; padding: 2px 10px; border-radius: 99px; font-size: 10px; font-weight: bold; }
+        
+        /* 季节按钮样式 */
+        .season-btn { transition: all 0.2s; cursor: pointer; }
+        .season-btn.active { background-color: #c5a059 !important; color: white !important; border-color: #c5a059 !important; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 relative">
@@ -57,6 +61,7 @@
             </header>
 
             <form id="quizForm" class="space-y-6 px-2">
+                <!-- 性别切换 -->
                 <div class="flex items-center justify-center gap-4">
                     <div class="gender-toggle" id="genderSwitch">
                         <div class="gender-knob" id="genderKnob"></div>
@@ -66,6 +71,7 @@
                     <input type="hidden" id="genderInput" name="gender" value="女性">
                 </div>
 
+                <!-- 身高 -->
                 <div>
                     <label class="block text-xs font-bold text-[#8c7a66] mb-4 uppercase text-center">身高: <span id="heightVal" class="text-[#c5a059]">170</span> cm</label>
                     <div class="relative pt-2">
@@ -74,6 +80,7 @@
                     </div>
                 </div>
 
+                <!-- 体重 -->
                 <div>
                     <label class="block text-xs font-bold text-[#8c7a66] mb-2 uppercase text-center">体重 (kg)</label>
                     <div class="weight-box">
@@ -81,6 +88,7 @@
                     </div>
                 </div>
 
+                <!-- 体型 -->
                 <select id="bodyShape" class="w-full bg-[#fcfaf5] border-b border-[#e5d5bc] text-sm py-2 px-2 outline-none">
                     <option value="pear">梨型 (上窄下宽)</option>
                     <option value="apple">苹果型 (腰腹丰满)</option>
@@ -90,11 +98,25 @@
                     <option value="unknown">暂不提供 (由 AI 分析)</option>
                 </select>
 
+                <!-- 季节选择（新增） -->
+                <div>
+                    <label class="block text-xs font-bold text-[#8c7a66] mb-2 uppercase text-center">当前季节</label>
+                    <div class="flex justify-center gap-3">
+                        <button type="button" data-season="春" class="season-btn px-4 py-1 border border-[#e5d5bc] rounded-full text-xs hover:bg-[#c5a059] hover:text-white transition-all">春</button>
+                        <button type="button" data-season="夏" class="season-btn px-4 py-1 border border-[#e5d5bc] rounded-full text-xs active bg-[#c5a059] text-white">夏</button>
+                        <button type="button" data-season="秋" class="season-btn px-4 py-1 border border-[#e5d5bc] rounded-full text-xs hover:bg-[#c5a059] hover:text-white transition-all">秋</button>
+                        <button type="button" data-season="冬" class="season-btn px-4 py-1 border border-[#e5d5bc] rounded-full text-xs hover:bg-[#c5a059] hover:text-white transition-all">冬</button>
+                    </div>
+                    <input type="hidden" id="seasonInput" name="season" value="夏">
+                </div>
+
+                <!-- 照片上传 -->
                 <label class="flex items-center justify-center gap-2 bg-[#fcfaf5] border-2 border-dashed border-[#e5d5bc] p-3 rounded-lg cursor-pointer hover:border-[#c5a059] transition-all">
                     <span id="fileName" class="text-xs text-[#8c7a66]">📸 上传照片，获取精准配色建议</span>
                     <input type="file" id="photo" class="hidden" accept="image/*">
                 </label>
 
+                <!-- 风格选择 -->
                 <div class="space-y-3">
                     <div class="flex flex-wrap justify-center gap-2">
                         <label class="cursor-pointer"><input type="radio" name="style" value="休闲" class="hidden peer" checked><span class="px-3 py-1.5 border border-[#e5d5bc] rounded-full text-xs peer-checked:bg-[#c5a059] peer-checked:text-white transition-all">休闲</span></label>
@@ -123,7 +145,7 @@
     </div>
 
     <script>
-        // 性别切换
+        // 性别切换动画
         const genderSwitch = document.getElementById('genderSwitch');
         const genderKnob = document.getElementById('genderKnob');
         const genderInput = document.getElementById('genderInput');
@@ -138,7 +160,7 @@
             maleLabel.style.color = isFemale ? '#ffffff' : '#8c7a66';
         };
 
-        // 体重滚轮
+        // 体重框：滚动加减逻辑
         const wInput = document.getElementById('weight');
         wInput.addEventListener('wheel', (e) => {
             e.preventDefault();
@@ -146,30 +168,62 @@
             wInput.value = parseInt(wInput.value || 60) + step;
         });
 
-        // 身高滑块
+        // 身高滑块同步
         const hInput = document.getElementById('height');
         hInput.oninput = () => {
             hInput.style.setProperty('--percent', `${(hInput.value - 140) / 60 * 100}%`);
             document.getElementById('heightVal').innerText = hInput.value;
         };
+        hInput.dispatchEvent(new Event('input'));
 
-        document.querySelectorAll('input[name="style"]').forEach(r => {
-            r.addEventListener('change', () => document.getElementById('customStyleInput').classList.toggle('hidden', r.value !== 'other'));
+        // 季节选择交互（新增）
+        const seasonBtns = document.querySelectorAll('.season-btn');
+        const seasonInput = document.getElementById('seasonInput');
+        seasonBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                seasonBtns.forEach(b => b.classList.remove('active', 'bg-[#c5a059]', 'text-white'));
+                btn.classList.add('active', 'bg-[#c5a059]', 'text-white');
+                seasonInput.value = btn.getAttribute('data-season');
+            });
         });
 
-        // 提交逻辑
+        // 风格选项联动
+        const otherRadio = document.getElementById('otherStyleRadio');
+        const customInput = document.getElementById('customStyleInput');
+        document.querySelectorAll('input[name="style"]').forEach(r => {
+            r.addEventListener('change', () => customInput.classList.toggle('hidden', r.value !== 'other'));
+        });
+
+        // 照片上传提示
+        document.getElementById('photo').onchange = function() {
+            document.getElementById('fileName').innerText = "已选择照片: " + this.files[0].name;
+        };
+
+        // 表单提交
         document.getElementById('quizForm').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
+            const btn = e.target.querySelector('button[type="submit"]');
             btn.disabled = true;
-            btn.innerText = "👗 正在构思中...";
+            btn.innerText = "👗 正在注入时尚灵魂...";
 
             const formData = new FormData();
             formData.append('height', hInput.value);
             formData.append('weight', wInput.value);
             formData.append('gender', genderInput.value);
             formData.append('body_shape', document.getElementById('bodyShape').value);
-            formData.append('style', document.getElementById('otherStyleRadio').checked ? document.getElementById('customStyleInput').value : document.querySelector('input[name="style"]:checked').value);
+            formData.append('season', seasonInput.value);   // 添加季节
+            const selectedStyle = document.querySelector('input[name="style"]:checked');
+            let styleValue = selectedStyle.value;
+            if (styleValue === 'other') {
+                styleValue = customInput.value.trim();
+                if (!styleValue) {
+                    alert("请输入自定义风格");
+                    btn.disabled = false;
+                    btn.innerText = "🚀 生成我的专属穿搭";
+                    return;
+                }
+            }
+            formData.append('style', styleValue);
             
             const photo = document.getElementById('photo').files[0];
             if(photo) formData.append('photo', photo);
@@ -179,20 +233,22 @@
                 const data = await res.json();
                 if(data.success) {
                     const advice = data.advice;
-                    // 渲染逻辑
                     document.getElementById('resTop').innerText = advice.top;
                     document.getElementById('resBottom').innerText = advice.bottom;
-                    document.getElementById('resShoes').innerText = advice.shoes; // 渲染鞋子
-                    document.getElementById('resAnalysis').innerText = "🧠 AI 逻辑说明: " + advice.analysis;
+                    document.getElementById('resShoes').innerText = advice.shoes;
+                    document.getElementById('resAnalysis').innerText = "🧠 AI 搭配哲学: " + advice.analysis;
                     document.getElementById('tagArea').innerHTML = (advice.style_tags || []).map(t => `<span class="tag-bubble"># ${t}</span>`).join('');
                     document.getElementById('resultCard').classList.remove('hidden');
+                    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert("生成失败：" + (data.error || "未知错误"));
                 }
-            } catch(e) { alert("生成失败"); }
-            finally { btn.disabled = false; btn.innerText = "🚀 生成我的专属穿搭"; }
-        };
-
-        document.getElementById('photo').onchange = function() {
-            document.getElementById('fileName').innerText = "已选择: " + this.files[0].name;
+            } catch(e) { 
+                alert("AI 服务连接超时，请检查后端运行状态"); 
+            } finally { 
+                btn.disabled = false; 
+                btn.innerText = "🚀 生成我的专属穿搭"; 
+            }
         };
     </script>
 </body>
