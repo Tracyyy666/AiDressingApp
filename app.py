@@ -5,54 +5,54 @@ from flask import Flask, render_template, request, jsonify
 from zhipuai import ZhipuAI
 
 load_dotenv()
-
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/recommend', methods=['POST'])
-def recommend():
-    data = request.get_json()
-    height = data.get('height')
-    weight = data.get('weight')
-    body_shape = data.get('bodyShape')
-    styles = data.get('styles', [])
-    
-    shape_map = {
-        'pear': '梨型（肩窄臀宽）',
-        'apple': '苹果型（腰腹丰满）',
-        'hourglass': '沙漏型（胸臀丰满腰细）',
-        'rectangle': '矩形（肩腰臀宽相近）',
-        'inverted_triangle': '倒三角（肩宽胯窄）'
-    }
-    body_shape_cn = shape_map.get(body_shape, body_shape)
-    styles_cn = ', '.join(styles)
-
-    prompt = f"""
-你是一位专业形象顾问。用户身高{height}cm，体重{weight}kg，体型为{body_shape_cn}，喜欢的风格是{styles_cn}。
-请推荐一套完整的穿搭，包含上衣、下装、鞋子，并给出推荐理由（需结合体型和风格）。
-请严格按以下JSON格式输出，不要有其他文字：
-{{"top": "上衣名称", "bottom": "下装名称", "shoes": "鞋子名称", "reason": "推荐理由"}}
-"""
-    api_key = os.getenv('ZHIPU_API_KEY')
-    if not api_key:
-        return jsonify({"error": "服务器未配置 API Key，请在 .env 文件中设置 ZHIPU_API_KEY"}), 500
-
+@app.route('/get_advice', methods=['POST'])
+def get_advice():
     try:
+        # 获取前端发送的 FormData
+        height = request.form.get('height')
+        weight = request.form.get('weight')
+        gender = request.form.get('gender', '女性')
+        body_shape = request.form.get('body_shape')
+        style = request.form.get('style')
+        photo = request.files.get('photo')
+
+        # 强化 Prompt：要求鞋子建议必须“全面”
+        prompt = f"""
+你是一位拥有顶级审美和10年经验的私人形象顾问。请务必使用【中文】回答。
+[用户档案] 性别:{gender} | 身高:{height}cm | 体重:{weight}kg | 体型:{body_shape} | 核心风格:{style}
+
+[指令]
+1. 给出上装、下装及【全面】的鞋子建议。
+2. 【鞋子建议要求】：必须包含鞋型（如尖头、方头）、鞋跟高度（如厚底、3-5cm中跟）、材质（如漆皮、麂皮）以及它如何与下装衔接以优化比例（如延长腿部线条）。
+3. 严禁使用“高腰”、“显瘦”等万金油词汇。请结合性别【{gender}】给出具有质感的专业描述。
+4. 返回 JSON 格式，字段值必须为纯字符串：
+{{ 
+  "top": "具体上装描述（包含面料与色彩）", 
+  "bottom": "具体下装描述（包含剪裁细节）", 
+  "shoes": "全面的鞋履建议（包含鞋型、跟高及搭配逻辑）",
+  "analysis": "针对该身材、性别和风格的深度深度逻辑解析", 
+  "style_tags": ["风格标签1", "标签2"] 
+}}
+"""
+        api_key = os.getenv('ZHIPU_AI_API_KEY')
         client = ZhipuAI(api_key=api_key)
         response = client.chat.completions.create(
             model="glm-4-flash",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.7,
             response_format={"type": "json_object"}
         )
-        content = response.choices[0].message.content
-        outfit = json.loads(content)
-        return jsonify(outfit)
+        
+        advice = json.loads(response.choices[0].message.content)
+        return jsonify({"success": True, "advice": advice})
+
     except Exception as e:
-        return jsonify({"error": f"AI 调用失败: {str(e)}"}), 500
+        return jsonify({"success": False, "error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

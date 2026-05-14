@@ -3,146 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 智能穿搭助手 - 高级定制版</title>
+    <title>AI 穿搭灵魂助手 - 终极定制版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Noto Serif SC', serif;
-            background-color: #f5eee1;
-            overflow-x: hidden;
-        }
+        body { font-family: 'Noto Serif SC', serif; background-color: #f5eee1; background-image: radial-gradient(#d4c4a8 0.5px, transparent 0.5px); background-size: 30px 30px; }
+        
+        /* 身高滑块 */
+        input[type=range] { -webkit-appearance: none; background: linear-gradient(to right, #c5a059 0%, #c5a059 var(--percent, 50%), #e5d5bc var(--percent, 50%), #e5d5bc 100%); height: 2px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #c5a059; border: 2px solid #ffffff; cursor: pointer; }
+        .ruler-marks { position: absolute; bottom: -8px; left: 0; width: 100%; height: 8px; background-image: linear-gradient(90deg, #c5a059 1.5px, transparent 1.5px); background-size: 10% 100%; opacity: 0.3; }
 
-        input[type=range] {
-            -webkit-appearance: none;
-            background: linear-gradient(to right, #c5a059 0%, #c5a059 var(--percent, 50%), #e5d5bc var(--percent, 50%), #e5d5bc 100%);
-            height: 2px;
-            border-radius: 2px;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 20px; width: 20px;
-            border-radius: 50%;
-            background: #c5a059;
-            border: 2px solid #ffffff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            cursor: pointer;
-        }
+        /* 智能体重选择框 */
+        .weight-box { background: #fcfaf5; border: 1px solid #e5d5bc; border-radius: 12px; height: 56px; display: flex; align-items: center; justify-content: center; position: relative; transition: border-color 0.3s; }
+        .weight-box:hover { border-color: #c5a059; }
+        .weight-input { background: transparent; border: none; text-align: center; font-size: 1.5rem; color: #c5a059; font-weight: bold; width: 100%; outline: none; cursor: ns-resize; }
+        .weight-input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-        .ruler-marks {
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 100%;
-            height: 10px;
-            background-image: linear-gradient(90deg, #c5a059 1px, transparent 1px);
-            background-size: 10% 100%;
-            opacity: 0.3;
-        }
+        /* 性别动态切换 */
+        .gender-toggle { position: relative; width: 140px; height: 40px; background: #fcfaf5; border: 1px solid #e5d5bc; border-radius: 20px; display: flex; cursor: pointer; padding: 2px; }
+        .gender-knob { position: absolute; width: 68px; height: 34px; background: #c5a059; border-radius: 17px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .gender-label { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; z-index: 10; transition: color 0.3s; }
 
-        .star {
-            color: #846b3a;
-            position: absolute;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* 历史记录面板样式 */
-        .history-panel {
-            background: #fcfaf7;
-            border: 1px solid #e5d5bc;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-top: 1.5rem;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .history-item {
-            border-bottom: 1px solid #f0e6d6;
-            padding: 0.8rem 0;
-            font-size: 0.85rem;
-        }
-        .history-item small {
-            color: #8c7a66;
-        }
-        .history-btn {
-            background: #fcfaf7;
-            border: 1px solid #e5d5bc;
-            color: #4a3a2a;
-            transition: all 0.2s;
-            width: 100%;
-            padding: 0.6rem;
-            border-radius: 2rem;
-            font-size: 0.8rem;
-            margin-top: 1rem;
-            cursor: pointer;
-        }
-        .history-btn:hover {
-            background: #c5a059;
-            color: white;
-            border-color: #c5a059;
-        }
-        .hidden-history {
-            display: none;
-        }
+        .star { color: #846b3a; position: absolute; pointer-events: none; z-index: 0; }
+        .tag-bubble { background: #ebd3a6; color: #4a3a2a; padding: 2px 10px; border-radius: 99px; font-size: 10px; font-weight: bold; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 relative">
 
-    <!-- 装饰星星 -->
     <div class="fixed inset-0 pointer-events-none z-0">
-        <div class="star text-4xl top-[5%] left-[10%]">✦</div>
-        <div class="star text-3xl top-[15%] left-[40%] opacity-60">✦</div>
-        <div class="star text-5xl top-[40%] left-[8%] opacity-40">✦</div>
-        <div class="star text-2xl top-[70%] left-[15%]">✦</div>
-        <div class="star text-4xl bottom-10 left-[30%] opacity-80">✦</div>
-        <div class="star text-5xl top-[8%] right-[15%]">✦</div>
-        <div class="star text-3xl top-[45%] right-[10%] opacity-50">✦</div>
-        <div class="star text-4xl bottom-20 right-[5%]">✦</div>
-        <div class="star text-5xl bottom-[40%] right-[12%] opacity-40">✦</div>
-        <div class="star text-2xl top-1/2 left-1/4">✧</div>
-        <div class="star text-3xl bottom-1/3 right-1/3 opacity-50">✧</div>
+        <div class="star text-5xl top-[5%] left-[10%] animate-pulse">✦</div>
+        <div class="star text-4xl bottom-20 right-[5%] animate-pulse">✦</div>
+        <div class="star text-3xl top-[35%] right-[28%] opacity-40">✧</div>
     </div>
 
     <div class="relative w-full max-w-lg z-10">
-        <!-- 装饰图形（保留原样） -->
-        <svg class="absolute -left-64 top-1/2 -translate-y-1/2 w-[460px] h-auto opacity-35 text-[#846b3a] pointer-events-none hidden lg:block transform rotate-[-6deg]" viewBox="0 0 200 300" fill="none" stroke="currentColor" stroke-width="0.9">
-            <path d="M100 20 L95 25 M100 20 L105 25 M100 20 C100 15 105 10 110 15" />
-            <path d="M70 50 C80 45 120 45 130 50 L130 60 C115 75 85 75 70 60 Z" />
-            <path d="M70 60 C75 90 85 105 100 105 C115 105 125 90 130 60" />
-            <path d="M100 105 C70 120 40 180 20 280 Q100 270 180 280 C160 180 130 120 100 105" />
-            <path d="M60 150 Q100 140 140 150" opacity="0.7" />
-            <path d="M45 200 Q100 185 155 200" opacity="0.7" />
-            <path d="M30 250 Q100 230 170 250" opacity="0.7" />
+        <svg class="absolute -left-64 top-1/2 -translate-y-1/2 w-[480px] h-auto opacity-30 text-[#846b3a] pointer-events-none hidden lg:block transform rotate-[-8deg]" viewBox="0 0 200 300" fill="none" stroke="currentColor" stroke-width="0.8">
+            <path d="M100 15 L95 20 M100 15 L105 20 M100 15 C100 10 105 5 110 10 M65 45 C75 40 125 40 135 45 L135 55 C120 70 80 70 65 55 Z M65 55 C70 85 85 105 100 105 C115 105 130 85 135 55" />
+            <path d="M100 105 C80 120 50 170 30 285 Q100 270 170 285 C150 170 120 120 100 105" />
+        </svg>
+        <svg class="absolute -right-56 top-1/2 -translate-y-1/2 w-[380px] h-auto opacity-20 text-[#846b3a] pointer-events-none hidden lg:block transform rotate-[6deg]" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.0">
+            <path d="M65 25 H135 L145 165 Q100 175 45 165 Z M100 25 L82 75 L100 165 L118 75 Z" />
+            <circle cx="100" cy="105" r="1.5" fill="currentColor" />
         </svg>
 
-        <svg class="absolute -right-56 top-1/2 -translate-y-1/2 w-[360px] h-auto opacity-25 text-[#846b3a] pointer-events-none hidden lg:block transform rotate-[5deg]" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.1">
-            <path d="M65 30 H135 L145 160 Q100 170 55 160 Z" />
-            <path d="M100 30 L85 70 L100 160 L115 70 Z" />
-            <path d="M85 70 L65 30 M115 70 L135 30" />
-            <path d="M65 30 L40 65 L52 160" />
-            <path d="M135 30 L160 65 L148 160" />
-            <circle cx="100" cy="100" r="1.5" fill="currentColor" />
-            <circle cx="100" cy="130" r="1.5" fill="currentColor" />
-        </svg>
-
-        <div class="bg-[#fdfcf7] p-8 md:p-12 rounded-2xl shadow-[0_20px_60px_rgba(74,58,42,0.15)] w-full relative z-20 border border-[#e5d5bc]">
+        <div class="bg-[#fdfcf7] p-8 md:p-10 rounded-2xl shadow-2xl w-full relative z-20 border border-[#e5d5bc]">
             <div class="absolute top-3 left-3 right-3 bottom-3 border border-[#f0e6d6] pointer-events-none rounded-lg"></div>
 
-            <header class="text-center mb-10">
-                <div class="inline-block relative">
-                    <span class="absolute -left-10 top-1/2 -translate-y-1/2 text-[#c5a059] text-2xl">✧</span>
-                    <h1 class="text-3xl font-bold text-[#4a3a2a] tracking-widest flex items-center justify-center gap-4">
-                        AI 智能穿搭助手
-                    </h1>
-                    <span class="absolute -right-10 top-1/2 -translate-y-1/2 text-[#c5a059] text-2xl">✧</span>
-                </div>
-                <p class="text-[#8c7a66] text-xs tracking-[0.3em] font-light uppercase mt-4">Personal Stylist Guide</p>
+            <header class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-[#4a3a2a] tracking-widest flex items-center justify-center gap-3">
+                    <span class="text-[#c5a059]">✧</span> AI 穿搭灵魂助手 <span class="text-[#c5a059]">✧</span>
+                </h1>
             </header>
 
-            <form id="quizForm" class="space-y-8 px-2">
+            <form id="quizForm" class="space-y-6 px-2">
+                <div class="flex items-center justify-center gap-4">
+                    <div class="gender-toggle" id="genderSwitch">
+                        <div class="gender-knob" id="genderKnob"></div>
+                        <div class="gender-label text-white" id="femaleLabel">女性</div>
+                        <div class="gender-label text-[#8c7a66]" id="maleLabel">男性</div>
+                    </div>
+                    <input type="hidden" id="genderInput" name="gender" value="女性">
+                </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-[#8c7a66] mb-3 tracking-widest uppercase">身高 (cm): <span id="heightVal" class="text-[#c5a059] text-sm">170</span></label>
+                    <label class="block text-xs font-bold text-[#8c7a66] mb-4 uppercase text-center">身高: <span id="heightVal" class="text-[#c5a059]">170</span> cm</label>
                     <div class="relative pt-2">
                         <input type="range" min="140" max="200" value="170" id="height" class="w-full">
                         <div class="ruler-marks pointer-events-none"></div>
@@ -150,249 +75,125 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-[#8c7a66] mb-3 tracking-widest uppercase">体重 (kg)</label>
-                    <input type="number" placeholder="例如: 60" id="weight" class="w-full bg-[#fcfaf5] px-4 py-2 border-b border-[#e5d5bc] text-[#4a3a2a] outline-none focus:border-[#c5a059] transition-all">
-                </div>
-
-                <div class="space-y-3">
-                    <label class="block text-xs font-bold text-[#8c7a66] tracking-widest uppercase">你的体型</label>
-                    <div class="relative">
-                        <select id="bodyShape" class="w-full bg-[#fcfaf5] px-4 py-2 border-b border-[#e5d5bc] text-[#4a3a2a] outline-none cursor-pointer appearance-none">
-                            <option value="pear">梨型 (上窄下宽)</option>
-                            <option value="apple">苹果型 (腰腹丰满)</option>
-                            <option value="hourglass">沙漏型 (凹凸有致)</option>
-                            <option value="rectangle">矩形 (直线条)</option>
-                            <option value="inverted_triangle">倒三角 (肩宽胯窄)</option>
-                        </select>
-                        <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[#c5a059] pointer-events-none">▾</span>
+                    <label class="block text-xs font-bold text-[#8c7a66] mb-2 uppercase text-center">体重 (kg)</label>
+                    <div class="weight-box">
+                        <input type="number" id="weight" value="60" class="weight-input" title="滚动鼠标加减 / 点击手动输入">
                     </div>
                 </div>
 
+                <select id="bodyShape" class="w-full bg-[#fcfaf5] border-b border-[#e5d5bc] text-sm py-2 px-2 outline-none">
+                    <option value="pear">梨型 (上窄下宽)</option>
+                    <option value="apple">苹果型 (腰腹丰满)</option>
+                    <option value="hourglass">沙漏型 (凹凸有致)</option>
+                    <option value="rectangle">矩形 (直线条)</option>
+                    <option value="inverted_triangle">倒三角 (肩宽胯窄)</option>
+                    <option value="unknown">暂不提供 (由 AI 分析)</option>
+                </select>
+
+                <label class="flex items-center justify-center gap-2 bg-[#fcfaf5] border-2 border-dashed border-[#e5d5bc] p-3 rounded-lg cursor-pointer hover:border-[#c5a059] transition-all">
+                    <span id="fileName" class="text-xs text-[#8c7a66]">📸 上传照片，获取精准配色建议</span>
+                    <input type="file" id="photo" class="hidden" accept="image/*">
+                </label>
+
                 <div class="space-y-3">
-                    <label class="block text-xs font-bold text-[#8c7a66] tracking-widest uppercase">穿搭风格 (可选)</label>
-                    <div class="flex flex-wrap gap-3">
-                        <label class="cursor-pointer group">
-                            <input type="checkbox" name="style" value="休闲" class="hidden peer">
-                            <span class="px-5 py-1.5 border border-[#e5d5bc] rounded-full text-xs text-[#8c7a66] transition-all peer-checked:bg-[#c5a059] peer-checked:text-white peer-checked:border-[#c5a059]">休闲</span>
-                        </label>
-                        <label class="cursor-pointer group">
-                            <input type="checkbox" name="style" value="职场" class="hidden peer">
-                            <span class="px-5 py-1.5 border border-[#e5d5bc] rounded-full text-xs text-[#8c7a66] transition-all peer-checked:bg-[#c5a059] peer-checked:text-white peer-checked:border-[#c5a059]">通勤</span>
-                        </label>
-                        <label class="cursor-pointer group">
-                            <input type="checkbox" name="style" value="约会" class="hidden peer">
-                            <span class="px-5 py-1.5 border border-[#e5d5bc] rounded-full text-xs text-[#8c7a66] transition-all peer-checked:bg-[#c5a059] peer-checked:text-white peer-checked:border-[#c5a059]">约会</span>
-                        </label>
-                        <label class="cursor-pointer group">
-                            <input type="checkbox" name="style" value="复古" class="hidden peer">
-                            <span class="px-5 py-1.5 border border-[#e5d5bc] rounded-full text-xs text-[#8c7a66] transition-all peer-checked:bg-[#c5a059] peer-checked:text-white peer-checked:border-[#c5a059]">复古</span>
-                        </label>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <label class="cursor-pointer"><input type="radio" name="style" value="休闲" class="hidden peer" checked><span class="px-3 py-1.5 border border-[#e5d5bc] rounded-full text-xs peer-checked:bg-[#c5a059] peer-checked:text-white transition-all">休闲</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="style" value="通勤" class="hidden peer"><span class="px-3 py-1.5 border border-[#e5d5bc] rounded-full text-xs peer-checked:bg-[#c5a059] peer-checked:text-white transition-all">通勤</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="style" value="复古" class="hidden peer"><span class="px-3 py-1.5 border border-[#e5d5bc] rounded-full text-xs peer-checked:bg-[#c5a059] peer-checked:text-white transition-all">复古</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="style" value="other" class="hidden peer" id="otherStyleRadio"><span class="px-3 py-1.5 border border-[#e5d5bc] rounded-full text-xs peer-checked:bg-[#c5a059] peer-checked:text-white transition-all">其他</span></label>
                     </div>
+                    <input type="text" id="customStyleInput" placeholder="请输入自定义风格" class="w-full hidden bg-[#fcfaf5] border-b border-[#c5a059] text-xs py-2 px-2 outline-none text-center">
                 </div>
 
-                <button type="submit" class="w-full bg-[#1a202c] text-[#f5eee1] py-4 rounded-xl font-bold tracking-[0.3em] hover:bg-[#2d3748] transition-all shadow-xl">
-                    生成我的专属穿搭
+                <button type="submit" class="w-full bg-[#1a202c] text-white py-4 rounded-xl font-bold tracking-widest hover:opacity-90 shadow-xl transition-all">
+                    🚀 生成我的专属穿搭
                 </button>
             </form>
 
-            <div id="resultCard" class="mt-12 p-8 bg-[#f9f7f2] rounded-xl border border-[#e5d5bc] hidden shadow-inner relative">
-                <h3 class="text-sm font-bold text-[#4a3a2a] mb-6 border-b border-[#e5d5bc] pb-2 tracking-[0.2em] flex items-center gap-2">
-                    <span class="text-[#c5a059]">✧</span> AI 专属建议
-                </h3>
-                <div class="space-y-4 text-xs text-[#4a3a2a] leading-relaxed">
+            <div id="resultCard" class="mt-12 p-8 bg-[#f9f7f2] rounded-xl border border-[#e5d5bc] hidden shadow-inner">
+                <div id="tagArea" class="flex flex-wrap gap-2 mb-4"></div>
+                <div class="space-y-5 text-xs leading-loose text-[#4a3a2a]">
                     <p><strong class="text-[#c5a059] mr-2">👕 上装建议:</strong> <span id="resTop"></span></p>
                     <p><strong class="text-[#c5a059] mr-2">👖 下装建议:</strong> <span id="resBottom"></span></p>
-                    <p><strong class="text-[#c5a059] mr-2">👟 鞋履搭配:</strong> <span id="resShoes"></span></p>
-                    <div class="mt-6 pt-4 border-t border-[#e5d5bc]">
-                        <strong class="text-[#c5a059] block mb-2 tracking-widest uppercase">🧠 穿搭逻辑说明：</strong>
-                        <p id="resAnalysis" class="italic text-[#8c7a66] leading-loose"></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 历史记录按钮和面板 -->
-            <div class="mt-4">
-                <button id="historyBtn" class="history-btn">📜 历史搭配记录</button>
-                <div id="historyPanel" class="history-panel hidden-history">
-                    <div id="historyList"></div>
+                    <p><strong class="text-[#c5a059] mr-2">👟 鞋履建议:</strong> <span id="resShoes"></span></p>
+                    <div class="mt-6 pt-4 border-t border-[#e5d5bc] italic text-[#8c7a66]" id="resAnalysis"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        (function() {
-            // 获取 DOM 元素
-            const heightInput = document.getElementById('height');
-            const heightVal = document.getElementById('heightVal');
-            const weightInput = document.getElementById('weight');
-            const bodyShapeSelect = document.getElementById('bodyShape');
-            const quizForm = document.getElementById('quizForm');
-            const resultCard = document.getElementById('resultCard');
-            const resTop = document.getElementById('resTop');
-            const resBottom = document.getElementById('resBottom');
-            const resShoes = document.getElementById('resShoes');
-            const resAnalysis = document.getElementById('resAnalysis');
-            const historyBtn = document.getElementById('historyBtn');
-            const historyPanel = document.getElementById('historyPanel');
-            const historyListDiv = document.getElementById('historyList');
+        // 性别切换
+        const genderSwitch = document.getElementById('genderSwitch');
+        const genderKnob = document.getElementById('genderKnob');
+        const genderInput = document.getElementById('genderInput');
+        const femaleLabel = document.getElementById('femaleLabel');
+        const maleLabel = document.getElementById('maleLabel');
 
-            // 滑块更新
-            function updateSlider() {
-                const percent = (heightInput.value - heightInput.min) / (heightInput.max - heightInput.min) * 100;
-                heightInput.style.setProperty('--percent', `${percent}%`);
-                heightVal.innerText = heightInput.value;
-            }
-            heightInput.addEventListener('input', updateSlider);
-            updateSlider();
+        genderSwitch.onclick = () => {
+            const isFemale = genderInput.value === '女性';
+            genderInput.value = isFemale ? '男性' : '女性';
+            genderKnob.style.transform = isFemale ? 'translateX(66px)' : 'translateX(0)';
+            femaleLabel.style.color = isFemale ? '#8c7a66' : '#ffffff';
+            maleLabel.style.color = isFemale ? '#ffffff' : '#8c7a66';
+        };
 
-            // 获取选中的风格（中文值）
-            function getSelectedStyles() {
-                const checkboxes = document.querySelectorAll('input[name="style"]:checked');
-                return Array.from(checkboxes).map(cb => cb.value);
-            }
+        // 体重滚轮
+        const wInput = document.getElementById('weight');
+        wInput.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const step = e.deltaY < 0 ? 1 : -1;
+            wInput.value = parseInt(wInput.value || 60) + step;
+        });
 
-            // 保存历史到后端
-            async function saveHistory(userData, outfit) {
-                const payload = {
-                    user_id: "default",
-                    height: userData.height,
-                    weight: userData.weight,
-                    bodyShape: userData.bodyShape,
-                    styles: userData.styles,
-                    top: outfit.top,
-                    bottom: outfit.bottom,
-                    shoes: outfit.shoes,
-                    reason: outfit.reason
-                };
-                try {
-                    await fetch('/save_history', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                } catch (err) {
-                    console.warn("保存历史失败", err);
+        // 身高滑块
+        const hInput = document.getElementById('height');
+        hInput.oninput = () => {
+            hInput.style.setProperty('--percent', `${(hInput.value - 140) / 60 * 100}%`);
+            document.getElementById('heightVal').innerText = hInput.value;
+        };
+
+        document.querySelectorAll('input[name="style"]').forEach(r => {
+            r.addEventListener('change', () => document.getElementById('customStyleInput').classList.toggle('hidden', r.value !== 'other'));
+        });
+
+        // 提交逻辑
+        document.getElementById('quizForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = "👗 正在构思中...";
+
+            const formData = new FormData();
+            formData.append('height', hInput.value);
+            formData.append('weight', wInput.value);
+            formData.append('gender', genderInput.value);
+            formData.append('body_shape', document.getElementById('bodyShape').value);
+            formData.append('style', document.getElementById('otherStyleRadio').checked ? document.getElementById('customStyleInput').value : document.querySelector('input[name="style"]:checked').value);
+            
+            const photo = document.getElementById('photo').files[0];
+            if(photo) formData.append('photo', photo);
+
+            try {
+                const res = await fetch('/get_advice', { method: 'POST', body: formData });
+                const data = await res.json();
+                if(data.success) {
+                    const advice = data.advice;
+                    // 渲染逻辑
+                    document.getElementById('resTop').innerText = advice.top;
+                    document.getElementById('resBottom').innerText = advice.bottom;
+                    document.getElementById('resShoes').innerText = advice.shoes; // 渲染鞋子
+                    document.getElementById('resAnalysis').innerText = "🧠 AI 逻辑说明: " + advice.analysis;
+                    document.getElementById('tagArea').innerHTML = (advice.style_tags || []).map(t => `<span class="tag-bubble"># ${t}</span>`).join('');
+                    document.getElementById('resultCard').classList.remove('hidden');
                 }
-            }
+            } catch(e) { alert("生成失败"); }
+            finally { btn.disabled = false; btn.innerText = "🚀 生成我的专属穿搭"; }
+        };
 
-            // 加载历史记录
-            async function loadHistory() {
-                try {
-                    const resp = await fetch('/get_history?user_id=default');
-                    const records = await resp.json();
-                    if (!records || records.length === 0) {
-                        historyListDiv.innerHTML = '<div class="text-center text-[#8c7a66] py-4">暂无历史搭配记录</div>';
-                        return;
-                    }
-                    let html = '';
-                    records.forEach(rec => {
-                        const timestamp = new Date(rec.timestamp).toLocaleString();
-                        const stylesStr = (rec.styles || []).join('、');
-                        html += `
-                            <div class="history-item">
-                                <small>📅 ${timestamp}</small><br>
-                                <strong>📏 ${rec.height}cm / ⚖️ ${rec.weight}kg / ${rec.bodyShape}</strong><br>
-                                🎨 风格：${stylesStr}<br>
-                                🧥 上衣：${rec.top} &nbsp;|&nbsp; 👖 下装：${rec.bottom} &nbsp;|&nbsp; 👟 鞋子：${rec.shoes}<br>
-                                💬 ${rec.reason}
-                            </div>
-                        `;
-                    });
-                    historyListDiv.innerHTML = html;
-                } catch (err) {
-                    console.error(err);
-                    historyListDiv.innerHTML = '<div class="text-center text-red-500 py-4">加载失败，请检查后端服务</div>';
-                }
-            }
-
-            // 历史按钮切换
-            historyBtn.addEventListener('click', async () => {
-                const isHidden = historyPanel.classList.contains('hidden-history');
-                if (isHidden) {
-                    await loadHistory();
-                    historyPanel.classList.remove('hidden-history');
-                    historyBtn.textContent = '📜 隐藏历史记录';
-                } else {
-                    historyPanel.classList.add('hidden-history');
-                    historyBtn.textContent = '📜 历史搭配记录';
-                }
-            });
-
-            // 表单提交
-            quizForm.onsubmit = async function(e) {
-                e.preventDefault();
-                const btn = e.target.querySelector('button');
-                const originalHTML = btn.innerHTML;
-                
-                // 加载动画
-                btn.innerHTML = `
-                    <div class="flex items-center justify-center gap-3">
-                        <div class="relative w-6 h-6 flex items-center justify-center">
-                            <div class="absolute inset-0 border-2 border-[#c5a059] border-t-transparent rounded-full animate-spin"></div>
-                            <span class="relative text-sm">🚀</span>
-                        </div>
-                        <span>AI 正在构思中</span>
-                        <span class="flex">
-                            <span class="animate-bounce" style="animation-delay: 0s">.</span>
-                            <span class="animate-bounce" style="animation-delay: 0.2s">.</span>
-                            <span class="animate-bounce" style="animation-delay: 0.4s">.</span>
-                        </span>
-                    </div>`;
-                btn.disabled = true;
-
-                const height = parseInt(heightInput.value);
-                const weight = parseFloat(weightInput.value);
-                if (!weight || weight <= 0) {
-                    alert("请正确填写体重");
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                    return;
-                }
-                const bodyShape = bodyShapeSelect.value;
-                const styles = getSelectedStyles();
-                if (styles.length === 0) {
-                    alert("请至少选择一种穿搭风格");
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                    return;
-                }
-
-                try {
-                    // 调用后端 /recommend 接口
-                    const response = await fetch('/recommend', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ height, weight, bodyShape, styles })
-                    });
-                    const data = await response.json();
-                    if (data.error) {
-                        alert("推荐失败：" + data.error);
-                    } else {
-                        // 显示结果（后端返回 top, bottom, shoes, reason）
-                        resTop.innerText = data.top;
-                        resBottom.innerText = data.bottom;
-                        resShoes.innerText = data.shoes;
-                        resAnalysis.innerText = data.reason;
-                        resultCard.classList.remove('hidden');
-                        resultCard.scrollIntoView({ behavior: 'smooth' });
-
-                        // 自动保存历史记录
-                        await saveHistory({ height, weight, bodyShape, styles }, data);
-                        // 如果历史面板当前是展开状态，刷新内容
-                        if (!historyPanel.classList.contains('hidden-history')) {
-                            await loadHistory();
-                        }
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert("无法连接到后端，请确认 Flask 服务已启动 (python app.py)");
-                } finally {
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                }
-            };
-        })();
+        document.getElementById('photo').onchange = function() {
+            document.getElementById('fileName').innerText = "已选择: " + this.files[0].name;
+        };
     </script>
 </body>
 </html>
